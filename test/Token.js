@@ -35,7 +35,7 @@ describe("Token contract", function () {
 
       await expect(
         token.transfer(buyer.address, 10000)
-      ).to.be.revertedWith("revert");
+      ).to.be.revertedWithoutReason();
 
       expect(await token.balanceOf(owner.address)).to.equal(initialOwnerBalance);
     });
@@ -47,7 +47,7 @@ describe("Token contract", function () {
 
     it("Should transfer tokens from one account to another with allowance", async function () {
       await token.approve(buyer.address, 100);
-      await token.transferFrom(owner.address, buyer.address, 100, { from: buyer.address });
+      await token.transferFrom(owner.address, buyer.address, 100);
 
       expect(await token.balanceOf(owner.address)).to.equal(900);
       expect(await token.balanceOf(buyer.address)).to.equal(100);
@@ -58,8 +58,8 @@ describe("Token contract", function () {
       await token.approve(buyer.address, 99);
 
       await expect(
-        token.transferFrom(owner.address, buyer.address, 100, { from: buyer.address })
-      ).to.be.revertedWith("revert");
+        token.transferFrom(owner.address, buyer.address, 100)
+      ).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
     });
   });
 });

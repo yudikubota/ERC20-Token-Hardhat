@@ -1,5 +1,7 @@
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
+
 interface IERC20 {
 
     function totalSupply() external view returns (uint256);
@@ -14,7 +16,6 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-
 contract Token is IERC20 {
     using SafeMath for uint256;
 
@@ -27,7 +28,7 @@ contract Token is IERC20 {
 
     uint256 totalSupply_;
 
-    constructor(uint256 total) public {
+    constructor(uint256 total) {
         totalSupply_ = total;
         balances[msg.sender] = totalSupply_;
     }
@@ -44,6 +45,7 @@ contract Token is IERC20 {
         require(numTokens <= balances[msg.sender]);
         balances[msg.sender] = balances[msg.sender].sub(numTokens);
         balances[receiver] = balances[receiver].add(numTokens);
+        console.log("Transfer %s tokens to %s", numTokens, receiver);
         emit Transfer(msg.sender, receiver, numTokens);
         return true;
     }
@@ -59,8 +61,8 @@ contract Token is IERC20 {
     }
 
     function transferFrom(address owner, address buyer, uint256 numTokens) public override returns (bool) {
-        require(numTokens <= balances[owner]);
-        require(numTokens <= allowed[owner][msg.sender]);
+        require(numTokens <= balances[owner], "Insufficient balance");
+        require(numTokens <= allowed[owner][msg.sender], "ERC20: transfer amount exceeds allowance");
 
         balances[owner] = balances[owner].sub(numTokens);
         allowed[owner][msg.sender] = allowed[owner][msg.sender].sub(numTokens);
